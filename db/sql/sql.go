@@ -10,7 +10,7 @@ type DBSql struct {
 	DB *sql.DB
 }
 
-func (d *DBSql) GetContext(ctx context.Context, res *[]*interface{}, query string, args ...any) (err error) {
+func (d *DBSql) GetContext(ctx context.Context, res []interface{}, query string, args ...any) (err error) {
 	sql, err := d.DB.PrepareContext(ctx, query)
 	if err != nil {
 		return
@@ -37,7 +37,7 @@ func (d *DBSql) GetContext(ctx context.Context, res *[]*interface{}, query strin
 		if err != nil {
 			return
 		}
-		*res = append(*res, &model)
+		res = append(res, &model)
 	}
 	return
 }
