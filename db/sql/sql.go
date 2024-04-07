@@ -10,6 +10,25 @@ type DBSql[T comparable] struct {
 	DB *sql.DB
 }
 
+func (d *DBSql[T]) CreateContext(ctx context.Context, query string, args ...any) (id int64, err error) {
+	sql, err := d.DB.PrepareContext(ctx, query)
+	if err != nil {
+		return
+	}
+
+	sqlRes, err := sql.ExecContext(ctx, args...)
+	if err != nil {
+		return
+	}
+
+	id, err = sqlRes.LastInsertId()
+	if err != nil {
+		return
+	}
+
+	return
+}
+
 func (d *DBSql[T]) GetContext(ctx context.Context, query string, args ...any) (res []T, err error) {
 	sql, err := d.DB.PrepareContext(ctx, query)
 	if err != nil {
@@ -42,12 +61,12 @@ func (d *DBSql[T]) GetContext(ctx context.Context, query string, args ...any) (r
 }
 
 func (d *DBSql[T]) CountContext(ctx context.Context, res int, query string, args ...any) (err error) {
-	sqlCount, err := d.DB.PrepareContext(ctx, query)
+	sql, err := d.DB.PrepareContext(ctx, query)
 	if err != nil {
 		return
 	}
 
-	rowCount, err := sqlCount.QueryContext(ctx, args...)
+	rowCount, err := sql.QueryContext(ctx, args...)
 	if err != nil {
 		return
 	}
