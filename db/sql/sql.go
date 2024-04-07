@@ -10,8 +10,17 @@ type DBSql[T comparable] struct {
 	DB *sql.DB
 }
 
-func (d *DBSql[T]) ExecContext(ctx context.Context, query string, args ...any) (id int64, err error) {
-	sql, err := d.DB.PrepareContext(ctx, query)
+func (d *DBSql[T]) ExecContext(ctx context.Context, query string, trx *sql.Tx, args ...any) (id int64, err error) {
+	if trx == nil {
+		trx, err = d.DB.Begin()
+		if err != nil {
+			return
+		}
+
+		defer trx.Commit()
+	}
+
+	sql, err := trx.PrepareContext(ctx, query)
 	if err != nil {
 		return
 	}
