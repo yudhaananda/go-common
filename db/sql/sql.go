@@ -16,6 +16,8 @@ type DBSql[T comparable] struct {
 
 func (d *DBSql[T]) ExecContext(ctx context.Context, query string, trx *Tx, args ...any) (id int64, err error) {
 	if trx == nil {
+		trx = &Tx{}
+
 		trx.Tx, err = d.DB.Begin()
 		if err != nil {
 			return
