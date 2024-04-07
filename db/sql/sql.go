@@ -6,23 +6,25 @@ import (
 	"reflect"
 )
 
-type Tx *sql.Tx
+type Tx struct {
+	Tx *sql.Tx
+}
 
 type DBSql[T comparable] struct {
 	DB *sql.DB
 }
 
-func (d *DBSql[T]) ExecContext(ctx context.Context, query string, trx *sql.Tx, args ...any) (id int64, err error) {
+func (d *DBSql[T]) ExecContext(ctx context.Context, query string, trx *Tx, args ...any) (id int64, err error) {
 	if trx == nil {
-		trx, err = d.DB.Begin()
+		trx.Tx, err = d.DB.Begin()
 		if err != nil {
 			return
 		}
 
-		defer trx.Commit()
+		defer trx.Tx.Commit()
 	}
 
-	sql, err := trx.PrepareContext(ctx, query)
+	sql, err := trx.Tx.PrepareContext(ctx, query)
 	if err != nil {
 		return
 	}
