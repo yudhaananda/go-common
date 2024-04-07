@@ -6,22 +6,11 @@ import (
 	"reflect"
 )
 
-type DBSql[T comparable] interface {
-	GetContext(ctx context.Context, query string, args ...any) (res []T, err error)
-	CountContext(ctx context.Context, query string, args ...any) (res int, err error)
-}
-
-type dbSql[T comparable] struct {
+type DBSql[T comparable] struct {
 	DB *sql.DB
 }
 
-func New[T comparable](db *sql.DB) DBSql[T] {
-	return &dbSql[T]{
-		DB: db,
-	}
-}
-
-func (d *dbSql[T]) GetContext(ctx context.Context, query string, args ...any) (res []T, err error) {
+func (d *DBSql[T]) GetContext(ctx context.Context, query string, args ...any) (res []T, err error) {
 	sql, err := d.DB.PrepareContext(ctx, query)
 	if err != nil {
 		return
@@ -53,7 +42,7 @@ func (d *dbSql[T]) GetContext(ctx context.Context, query string, args ...any) (r
 	return
 }
 
-func (d *dbSql[T]) CountContext(ctx context.Context, query string, args ...any) (res int, err error) {
+func (d *DBSql[T]) CountContext(ctx context.Context, query string, args ...any) (res int, err error) {
 	sqlCount, err := d.DB.PrepareContext(ctx, query)
 	if err != nil {
 		return
