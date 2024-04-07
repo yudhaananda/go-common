@@ -14,7 +14,7 @@ type DBSql[T comparable] struct {
 	DB *sql.DB
 }
 
-func (d *DBSql[T]) ExecContext(ctx context.Context, query string, trx *Tx, args ...any) (id int64, err error) {
+func (d *DBSql[T]) ExecContextReturnId(ctx context.Context, query string, trx *Tx, args ...any) (id int64, err error) {
 	if trx == nil {
 		trx = &Tx{}
 
@@ -37,6 +37,31 @@ func (d *DBSql[T]) ExecContext(ctx context.Context, query string, trx *Tx, args 
 	}
 
 	id, err = sqlRes.LastInsertId()
+	if err != nil {
+		return
+	}
+
+	return
+}
+
+func (d *DBSql[T]) ExecContext(ctx context.Context, query string, trx *Tx, args ...any) (err error) {
+	if trx == nil {
+		trx = &Tx{}
+
+		trx.Tx, err = d.DB.Begin()
+		if err != nil {
+			return
+		}
+
+		defer trx.Tx.Commit()
+	}
+
+	sql, err := trx.Tx.PrepareContext(ctx, query)
+	if err != nil {
+		return
+	}
+
+	_, err = sql.ExecContext(ctx, args...)
 	if err != nil {
 		return
 	}
