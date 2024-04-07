@@ -6,6 +6,8 @@ import (
 	"reflect"
 )
 
+type Tx sql.Tx
+
 type DBSql[T comparable] struct {
 	DB *sql.DB
 }
