@@ -12,8 +12,13 @@ type DBSql[T comparable] interface {
 }
 
 type dbSql[T comparable] struct {
-	DB        sql.DB
-	TableName string
+	DB *sql.DB
+}
+
+func New[T comparable](db *sql.DB) DBSql[T] {
+	return &dbSql[T]{
+		DB: db,
+	}
 }
 
 func (d *dbSql[T]) GetContext(ctx context.Context, query string, args ...any) (res []T, err error) {
