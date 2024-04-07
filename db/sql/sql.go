@@ -8,6 +8,7 @@ import (
 
 type DBSql[T comparable] interface {
 	GetContext(ctx context.Context, query string, args ...any) (res []T, err error)
+	CountContext(ctx context.Context, query string, args ...any) (res int, err error)
 }
 
 type dbSql[T comparable] struct {
@@ -43,6 +44,27 @@ func (d *dbSql[T]) GetContext(ctx context.Context, query string, args ...any) (r
 			return
 		}
 		res = append(res, model)
+	}
+	return
+}
+
+func (d *dbSql[T]) CountContext(ctx context.Context, query string, args ...any) (res int, err error) {
+	sqlCount, err := d.DB.PrepareContext(ctx, query)
+	if err != nil {
+		return
+	}
+
+	rowCount, err := sqlCount.QueryContext(ctx, args...)
+	if err != nil {
+		return
+	}
+
+	defer rowCount.Close()
+	for rowCount.Next() {
+		err = rowCount.Scan(&res)
+		if err != nil {
+			return
+		}
 	}
 	return
 }
