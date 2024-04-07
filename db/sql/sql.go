@@ -6,11 +6,11 @@ import (
 	"reflect"
 )
 
-type DBSql[T comparable] struct {
+type DBSql struct {
 	DB *sql.DB
 }
 
-func (d *DBSql[T]) GetContext(ctx context.Context, query string, args ...any) (res []T, err error) {
+func (d *DBSql) GetContext(ctx context.Context, query string, args ...any) (res []interface{}, err error) {
 	sql, err := d.DB.PrepareContext(ctx, query)
 	if err != nil {
 		return
@@ -23,7 +23,7 @@ func (d *DBSql[T]) GetContext(ctx context.Context, query string, args ...any) (r
 
 	defer row.Close()
 	for row.Next() {
-		var model T
+		var model interface{}
 
 		s := reflect.ValueOf(&model).Elem()
 		numCols := s.NumField()
@@ -42,7 +42,7 @@ func (d *DBSql[T]) GetContext(ctx context.Context, query string, args ...any) (r
 	return
 }
 
-func (d *DBSql[T]) CountContext(ctx context.Context, query string, args ...any) (res int, err error) {
+func (d *DBSql) CountContext(ctx context.Context, query string, args ...any) (res int, err error) {
 	sqlCount, err := d.DB.PrepareContext(ctx, query)
 	if err != nil {
 		return
