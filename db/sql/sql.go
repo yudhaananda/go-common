@@ -60,7 +60,7 @@ func (d *DBSql[T]) GetContext(ctx context.Context, query string, args ...any) (r
 	return
 }
 
-func (d *DBSql[T]) CountContext(ctx context.Context, res int, query string, args ...any) (err error) {
+func (d *DBSql[T]) CountContext(ctx context.Context, res *int, query string, args ...any) (err error) {
 	sql, err := d.DB.PrepareContext(ctx, query)
 	if err != nil {
 		return
@@ -73,7 +73,7 @@ func (d *DBSql[T]) CountContext(ctx context.Context, res int, query string, args
 
 	defer rowCount.Close()
 	for rowCount.Next() {
-		err = rowCount.Scan(&res)
+		err = rowCount.Scan(res)
 		if err != nil {
 			return
 		}
