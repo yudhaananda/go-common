@@ -3,7 +3,8 @@ package querybuilder
 import (
 	"fmt"
 	"reflect"
-	"time"
+
+	"github.com/yudhaananda/go-common/validation"
 )
 
 func BuildTableMember(model any) string {
@@ -35,7 +36,7 @@ func BuildCreateQuery(model any) (string, []any) {
 
 	isQueryNeedComa := false
 	for i := 0; i < tpe.NumField(); i++ {
-		if !isEmpty(fmt.Sprint(ref.Field(i).Interface())) {
+		if !validation.IsEmpty(fmt.Sprint(ref.Field(i).Interface())) {
 			if isQueryNeedComa {
 				table += ", "
 				values += ", "
@@ -65,7 +66,7 @@ func BuildUpdateQuery(id int, model any) (string, []any) {
 
 	isQueryNeedComa := false
 	for i := 0; i < tpe.NumField(); i++ {
-		if !isEmpty(fmt.Sprint(ref.Field(i).Interface())) {
+		if !validation.IsEmpty(fmt.Sprint(ref.Field(i).Interface())) {
 			if isQueryNeedComa {
 				query += ", "
 			}
@@ -79,8 +80,4 @@ func BuildUpdateQuery(id int, model any) (string, []any) {
 	query += " WHERE id=?"
 	args = append(args, id)
 	return query, args
-}
-
-func isEmpty(check string) bool {
-	return check == "0" || check == "" || check == fmt.Sprint(time.Time{})
 }

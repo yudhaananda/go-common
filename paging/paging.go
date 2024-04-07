@@ -1,8 +1,10 @@
-package querybuilder
+package paging
 
 import (
 	"fmt"
 	"reflect"
+
+	"github.com/yudhaananda/go-common/validation"
 )
 
 type Paging[T comparable] struct {
@@ -29,7 +31,7 @@ func (f *Paging[T]) QueryBuilder() (string, []any) {
 
 	// Adding where statement
 	for i := 0; i < tpe.NumField(); i++ {
-		if !isEmpty(fmt.Sprint(ref.Field(i).Interface())) {
+		if !validation.IsEmpty(fmt.Sprint(ref.Field(i).Interface())) {
 			query += " AND " + tpe.Field(i).Tag.Get("db") + "= ?"
 			args = append(args, ref.Field(i).Interface())
 		}
