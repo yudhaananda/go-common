@@ -2,8 +2,8 @@ package response
 
 type Response struct {
 	Meta   Meta        `json:"meta"`
-	Data   interface{} `json:"data"`
-	Errors interface{} `json:"errors"`
+	Data   interface{} `json:"data,omitempty"`
+	Errors interface{} `json:"errors,omitempty"`
 }
 
 type Meta struct {
