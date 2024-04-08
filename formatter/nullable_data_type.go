@@ -14,6 +14,13 @@ type Null[T comparable] struct {
 	Valid bool
 }
 
+func NewNull[T comparable](data T) Null[T] {
+	return Null[T]{
+		Data:  data,
+		Valid: true,
+	}
+}
+
 func (n *Null[T]) Scan(value any) error {
 	var data T
 	if value == nil {
