@@ -1,6 +1,10 @@
 package env
 
-import "os"
+import (
+	"os"
+
+	"github.com/joho/godotenv"
+)
 
 type Env struct {
 	DB_USER          string
@@ -12,8 +16,12 @@ type Env struct {
 	DB_TYPE          string
 }
 
-func SetEnv() Env {
-	env := Env{
+func SetEnv() (*Env, error) {
+	err := godotenv.Load(".env")
+	if err != nil {
+		return nil, err
+	}
+	env := &Env{
 		DB_USER:          os.Getenv("DB_USER"),
 		DB_PASS:          os.Getenv("DB_PASS"),
 		DB_PORT:          os.Getenv("DB_PORT"),
@@ -22,9 +30,13 @@ func SetEnv() Env {
 		JWT_SECRET_TOKEN: os.Getenv("JWT_SECRET_TOKEN"),
 		DB_TYPE:          os.Getenv("DB_TYPE"),
 	}
-	return env
+	return env, nil
 }
 
-func GetSecret() []byte {
-	return []byte(SetEnv().JWT_SECRET_TOKEN)
+func GetSecret() ([]byte, error) {
+	env, err := SetEnv()
+	if err != nil {
+		return nil, err
+	}
+	return []byte(env.JWT_SECRET_TOKEN), nil
 }
